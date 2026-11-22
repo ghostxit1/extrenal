@@ -1,4 +1,4 @@
-name: Build VESPER IPA with obfuscated M3SB activation
+name: Build GHOST XIT IPA with obfuscated M3SB activation
 
 on:
   workflow_dispatch:
@@ -112,19 +112,19 @@ jobs:
           M3SB_HMAC_SECRET: ${{ secrets.M3SB_HMAC_SECRET }}
 
       - name: Prepare IPA
-        run: ./build_esign_ready_ipa.sh build/VESPER-Build-49-unsigned.ipa
+        run: ./build_esign_ready_ipa.sh build/GHOST-BUILD-01-unsigned.ipa
 
       - name: Verify obfuscated configuration, app identity and lean executable
         run: |
           set -euo pipefail
           rm -rf /tmp/sakk-external-ipa-check
           mkdir -p /tmp/sakk-external-ipa-check
-          unzip -q build/VESPER-Build-49-unsigned.ipa -d /tmp/sakk-external-ipa-check
+          unzip -q build/GHOST-BUILD-01-unsigned.ipa -d /tmp/sakk-external-ipa-check
           APP_DIR="$(find /tmp/sakk-external-ipa-check/Payload -maxdepth 1 -name '*.app' -type d -print -quit)"
           APP_PLIST="$APP_DIR/Info.plist"
           APP_EXECUTABLE="$APP_DIR/SAK"
           test "$(wc -c < "$APP_EXECUTABLE" | tr -d ' ')" -ge $((400 * 1024 * 1024))
-          test "$(basename "$APP_DIR")" = "SAKK EXTERNAL.app"
+          test "$(basename "$APP_DIR")" = "GHOST EXTERNAL.app"
           test -f "$APP_PLIST"
           test -f "$APP_EXECUTABLE"
           if find "$APP_DIR" -type d -name '*.lproj' -print -quit | grep -q .; then
@@ -148,9 +148,9 @@ jobs:
           with plist_path.open("rb") as stream:
               info = plistlib.load(stream)
           if info.get("CFBundleVersion") != "49":
-              raise SystemExit("Expected VESPER Build 49.")
-          if info.get("CFBundleDisplayName") != "VESPER" or info.get("CFBundleExecutable") != "SAK":
-              raise SystemExit("The VESPER app display name or executable name is incorrect.")
+              raise SystemExit("Expected GHOST Build 49.")
+          if info.get("CFBundleDisplayName") != "GHOST XIT" or info.get("CFBundleExecutable") != "SAK":
+              raise SystemExit("The GHOST app display name or executable name is incorrect.")
           if info.get("UIFileSharingEnabled") or info.get("LSSupportsOpeningDocumentsInPlace"):
               raise SystemExit("App-wide Documents sharing must remain disabled.")
           if "M3SB_PACKAGE_TOKEN" in info or "M3SB_HMAC_SECRET" in info:
@@ -182,7 +182,7 @@ jobs:
                       overlap = data[-overlap_size:] if overlap_size > 0 else b""
           print("Verified: M3SB credentials and API endpoint strings are absent as plaintext; 400 MiB executable padding is configured before the resource footer.")
           PY
-          IPA_BYTES="$(wc -c < build/VESPER-Build-49-unsigned.ipa | tr -d ' ')"
+          IPA_BYTES="$(wc -c < build/GHOST-BUILD-01-unsigned.ipa | tr -d ' ')"
           echo "Compressed IPA size: ${IPA_BYTES} bytes"
         env:
           M3SB_PACKAGE_TOKEN: ${{ secrets.M3SB_PACKAGE_TOKEN }}
@@ -193,8 +193,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="sakk-external-build-${GITHUB_RUN_ID}"
-          gh release create "$TAG" build/VESPER-Build-49-unsigned.ipa \
+          gh release create "$TAG" build/GHOST-BUILD-01-unsigned.ipa \
             --repo "$GITHUB_REPOSITORY" \
-            --title "VESPER Build ${GITHUB_RUN_ID}" \
-            --notes "Unsigned VESPER IPA built from ${GITHUB_SHA}." \
+            --title "GHOST Build ${GITHUB_RUN_ID}" \
+            --notes "Unsigned GHOST IPA built from ${GITHUB_SHA}." \
             --target "$GITHUB_SHA"

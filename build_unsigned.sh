@@ -3,8 +3,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 BUILD_DIR="$ROOT/build"
-ARCHIVE="$BUILD_DIR/VESPER-Build-49.xcarchive"
-IPA="$BUILD_DIR/VESPER-Build-49-unsigned.ipa"
+ARCHIVE="$BUILD_DIR/GHOST-BUILD-01.xcarchive"
+IPA="$BUILD_DIR/GHOST-BUILD-01-unsigned.ipa"
 echo "Building repository revision: $(git -C "$ROOT" rev-parse --short HEAD)"
 
 if [[ -z "${M3SB_PACKAGE_TOKEN:-}" || -z "${M3SB_HMAC_SECRET:-}" ]]; then
@@ -28,7 +28,7 @@ xcodebuild \
   CODE_SIGN_IDENTITY='' \
   archive
 
-APP="$ARCHIVE/Products/Applications/SAKK EXTERNAL.app"
+APP="$ARCHIVE/Products/Applications/GHOST EXTERNAL.app"
 test -d "$APP"
 # Remote patches must never be embedded in the signed app. Remove packages
 # from every possible Xcode resource layout, not only from the app root.
